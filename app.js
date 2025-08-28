@@ -277,8 +277,38 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const btnStart = document.getElementById("btnStart");
   const btnStart2 = document.getElementById("btnStart2");
 
-  btnStart.onclick = (e)=>{ e.preventDefault(); showQuiz(); };
-  btnStart2.onclick = (e)=>{ e.preventDefault(); showQuiz(); };
+  function startQuiz(){
+    intro.classList.add("hidden");
+    results.classList.add("hidden");
+    quiz.classList.remove("hidden");
+    renderQuestion();
+    updateNav();
+    btnStart.textContent = "Sair";
+  }
+
+  function exitQuiz(){
+    intro.classList.remove("hidden");
+    quiz.classList.add("hidden");
+    results.classList.add("hidden");
+    idx = 0;
+    answers = Array(QUESTIONS.length).fill(null);
+    btnStart.textContent = "Começar";
+  }
+
+  btnStart.addEventListener("click", (e)=>{
+    e.preventDefault();
+    if(btnStart.textContent.trim() === "Começar"){
+      startQuiz();
+    } else {
+      exitQuiz();
+    }
+  });
+
+  btnStart2.addEventListener("click", (e)=>{
+    e.preventDefault();
+    // Simula clique no btnStart
+    btnStart.click();
+  });
 
   $("#btnPrev").onclick = ()=>{ idx=Math.max(0, idx-1); renderQuestion(); updateNav(); };
   $("#btnNext").onclick = ()=>{ idx=Math.min(QUESTIONS.length-1, idx+1); renderQuestion(); updateNav(); };
@@ -290,7 +320,12 @@ document.addEventListener("DOMContentLoaded", ()=>{
     renderQuestion();
     updateNav();
   };
-  $("#btnRefazer").onclick = resetAll;
+  $("#btnRefazer").onclick = ()=>{
+    idx = 0;
+    answers = Array(QUESTIONS.length).fill(null);
+    showQuiz();
+    btnStart.textContent = "Sair";
+  };
 
   $("#btnSalvar").onclick = ()=>{
     const payload = { answers, scores: computeScores(), finishedAt: new Date().toISOString() };
