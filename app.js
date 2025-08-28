@@ -270,6 +270,7 @@ function resetAll(){
   showQuiz();
 }
 
+
 // ---------------------------
 // EVENTS
 // ---------------------------
@@ -277,8 +278,28 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const btnStart = document.getElementById("btnStart");
   const btnStart2 = document.getElementById("btnStart2");
 
-  btnStart.onclick = (e)=>{ e.preventDefault(); showQuiz(); };
-  btnStart2.onclick = (e)=>{ e.preventDefault(); showQuiz(); };
+  // Botão principal: Começar <-> Sair
+  btnStart.onclick = (e)=>{
+    e.preventDefault();
+    if (btnStart.textContent === "Começar") {
+      showQuiz();
+      btnStart.textContent = "Sair";
+    } else {
+      // Reset e volta para tela inicial
+      intro.classList.remove("hidden");
+      quiz.classList.add("hidden");
+      results.classList.add("hidden");
+      btnStart.textContent = "Começar";
+      resetAll();
+    }
+  };
+
+  // Botão "Iniciar agora" na tela inicial
+  btnStart2.onclick = (e)=>{
+    e.preventDefault();
+    showQuiz();
+    btnStart.textContent = "Sair"; // também troca
+  };
 
   $("#btnPrev").onclick = ()=>{ idx=Math.max(0, idx-1); renderQuestion(); updateNav(); };
   $("#btnNext").onclick = ()=>{ idx=Math.min(QUESTIONS.length-1, idx+1); renderQuestion(); updateNav(); };
@@ -313,5 +334,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
     html2pdf().set(opt).from(node).save();
   };
 
-  document.getElementById("btnComoFunciona").onclick = ()=> document.getElementById("modalComo").showModal();
+  document.getElementById("btnComoFunciona").onclick = ()=> 
+    document.getElementById("modalComo").showModal();
 });
