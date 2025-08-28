@@ -264,12 +264,15 @@ function showQuiz(){
   updateNav();
 }
 
-function resetAll(){
+// Função de reset **sem mostrar quiz**
+function resetData(){
   idx = 0;
   answers = Array(QUESTIONS.length).fill(null);
-  showQuiz();
+  if(chart){ chart.destroy(); chart = null; }
+  progressBar.style.width = `0%`;
+  progressText.textContent = `Questão 1 / ${QUESTIONS.length}`;
+  questionContainer.innerHTML = "";
 }
-
 
 // ---------------------------
 // EVENTS
@@ -285,12 +288,12 @@ document.addEventListener("DOMContentLoaded", ()=>{
       showQuiz();
       btnStart.textContent = "Sair";
     } else {
-      // Reset e volta para tela inicial
+      // Ao clicar em Sair: voltar ao início
       intro.classList.remove("hidden");
       quiz.classList.add("hidden");
       results.classList.add("hidden");
       btnStart.textContent = "Começar";
-      resetAll();
+      resetData(); // só limpa dados
     }
   };
 
@@ -311,7 +314,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     renderQuestion();
     updateNav();
   };
-  $("#btnRefazer").onclick = resetAll;
+  $("#btnRefazer").onclick = ()=>{ resetData(); showQuiz(); };
 
   $("#btnSalvar").onclick = ()=>{
     const payload = { answers, scores: computeScores(), finishedAt: new Date().toISOString() };
