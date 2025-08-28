@@ -267,48 +267,46 @@ function showQuiz(){
 function resetAll(){
   idx = 0;
   answers = Array(QUESTIONS.length).fill(null);
-  showQuiz();
+  intro.classList.remove("hidden");
+  quiz.classList.add("hidden");
+  results.classList.add("hidden");
+  toggleStartButton(false); // volta botão header para "Começar"
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ---------------------------
+// BOTÃO DINÂMICO START / ENCERRAR
+// ---------------------------
+function toggleStartButton(isQuizActive) {
+  const btnStart = $("#btnStart");
+  if(isQuizActive) {
+    btnStart.textContent = "Encerrar";
+    btnStart.onclick = (e) => {
+      e.preventDefault();
+      resetAll();
+    };
+  } else {
+    btnStart.textContent = "Começar";
+    btnStart.onclick = (e) => {
+      e.preventDefault();
+      showQuiz();
+      toggleStartButton(true);
+    };
+  }
 }
 
 // ---------------------------
 // EVENTS
 // ---------------------------
 document.addEventListener("DOMContentLoaded", ()=>{
-  const btnStart = document.getElementById("btnStart");
-  const btnStart2 = document.getElementById("btnStart2");
+  const btnStart2 = $("#btnStart2");
+  const btnComoFunciona = $("#btnComoFunciona");
 
-  function startQuiz(){
-    intro.classList.add("hidden");
-    results.classList.add("hidden");
-    quiz.classList.remove("hidden");
-    renderQuestion();
-    updateNav();
-    btnStart.textContent = "Sair";
-  }
+  // Inicializa botão header
+  toggleStartButton(false);
 
-  function exitQuiz(){
-    intro.classList.remove("hidden");
-    quiz.classList.add("hidden");
-    results.classList.add("hidden");
-    idx = 0;
-    answers = Array(QUESTIONS.length).fill(null);
-    btnStart.textContent = "Começar";
-  }
-
-  btnStart.addEventListener("click", (e)=>{
-    e.preventDefault();
-    if(btnStart.textContent.trim() === "Começar"){
-      startQuiz();
-    } else {
-      exitQuiz();
-    }
-  });
-
-  btnStart2.addEventListener("click", (e)=>{
-    e.preventDefault();
-    // Simula clique no btnStart
-    btnStart.click();
-  });
+  // Botão da intro
+  btnStart2.onclick = (e)=>{ e.preventDefault(); showQuiz(); toggleStartButton(true); };
 
   $("#btnPrev").onclick = ()=>{ idx=Math.max(0, idx-1); renderQuestion(); updateNav(); };
   $("#btnNext").onclick = ()=>{ idx=Math.min(QUESTIONS.length-1, idx+1); renderQuestion(); updateNav(); };
@@ -320,12 +318,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     renderQuestion();
     updateNav();
   };
-  $("#btnRefazer").onclick = ()=>{
-    idx = 0;
-    answers = Array(QUESTIONS.length).fill(null);
-    showQuiz();
-    btnStart.textContent = "Sair";
-  };
+  $("#btnRefazer").onclick = resetAll;
 
   $("#btnSalvar").onclick = ()=>{
     const payload = { answers, scores: computeScores(), finishedAt: new Date().toISOString() };
@@ -348,5 +341,5 @@ document.addEventListener("DOMContentLoaded", ()=>{
     html2pdf().set(opt).from(node).save();
   };
 
-  document.getElementById("btnComoFunciona").onclick = ()=> document.getElementById("modalComo").showModal();
+  btnComoFunciona.onclick = ()=> $("#modalComo").showModal();
 });
