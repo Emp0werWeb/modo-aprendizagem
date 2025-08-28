@@ -272,4 +272,68 @@ function resetData(){
   if(chart){ chart.destroy(); chart=null; }
   progressBar.style.width = `0%`;
   progressText.textContent = `Questão 1 / ${QUESTIONS.length}`;
-  questionContainer
+  questionContainer.innerHTML = "";
+}
+
+// ---------------------------
+// EVENTS
+// ---------------------------
+document.addEventListener("DOMContentLoaded", ()=>{
+  const btnStart = $("#btnStart");
+  const btnStart2 = $("#btnStart2");
+
+  btnStart.onclick = (e)=>{
+    e.preventDefault();
+    if(btnStart.textContent.trim()==="Começar"){
+      showQuiz();
+      btnStart.textContent = "Sair";
+    } else {
+      intro.classList.remove("hidden");
+      quiz.classList.add("hidden");
+      results.classList.add("hidden");
+      btnStart.textContent = "Começar";
+      resetData();
+    }
+  };
+
+  btnStart2.onclick = (e)=>{
+    e.preventDefault();
+    showQuiz();
+    btnStart.textContent = "Sair";
+  };
+
+  $("#btnPrev").onclick = ()=>{ idx=Math.max(0, idx-1); renderQuestion(); updateNav(); };
+  $("#btnNext").onclick = ()=>{ idx=Math.min(QUESTIONS.length-1, idx+1); renderQuestion(); updateNav(); };
+  $("#btnFinish").onclick = ()=> renderResults();
+
+  $("#btnRevisar").onclick = ()=>{
+    results.classList.add("hidden");
+    quiz.classList.remove("hidden");
+    renderQuestion();
+    updateNav();
+  };
+  $("#btnRefazer").onclick = ()=>{ resetData(); showQuiz(); };
+
+  $("#btnSalvar").onclick = ()=>{
+    const payload = { answers, scores: computeScores(), finishedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "resultado-vakd.json"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  $("#btnPDF").onclick = ()=>{
+    const node = $("#results");
+    const opt = {
+      margin:       10,
+      filename:     'resultado-vakd.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(node).save();
+  };
+
+  $("#btnComoFunciona").onclick = ()=> $("#modalComo").showModal();
+});
