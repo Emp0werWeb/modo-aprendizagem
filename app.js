@@ -40,7 +40,9 @@ const TYPES = {
        ]},
 };
 
-// 12 questões, cada uma com 4 opções: V, A, K, D
+// ---------------------------
+// QUESTIONS
+// ---------------------------
 const QUESTIONS = [
   { title:"Quando você precisa lembrar de algo, você geralmente…",
     options:[
@@ -132,7 +134,7 @@ const QUESTIONS = [
 // STATE
 // ---------------------------
 let idx = 0;
-let answers = Array(QUESTIONS.length).fill(null); // 'V' | 'A' | 'K' | 'D'
+let answers = Array(QUESTIONS.length).fill(null);
 let chart;
 
 // ---------------------------
@@ -264,79 +266,10 @@ function showQuiz(){
   updateNav();
 }
 
-// Função de reset **sem mostrar quiz**
 function resetData(){
   idx = 0;
   answers = Array(QUESTIONS.length).fill(null);
-  if(chart){ chart.destroy(); chart = null; }
+  if(chart){ chart.destroy(); chart=null; }
   progressBar.style.width = `0%`;
   progressText.textContent = `Questão 1 / ${QUESTIONS.length}`;
-  questionContainer.innerHTML = "";
-}
-
-// ---------------------------
-// EVENTS
-// ---------------------------
-document.addEventListener("DOMContentLoaded", ()=>{
-  const btnStart = document.getElementById("btnStart");
-  const btnStart2 = document.getElementById("btnStart2");
-
-  // Botão principal: Começar <-> Sair
-  btnStart.onclick = (e)=>{
-    e.preventDefault();
-    if (btnStart.textContent === "Começar") {
-      showQuiz();
-      btnStart.textContent = "Sair";
-    } else {
-      // Ao clicar em Sair: voltar ao início
-      intro.classList.remove("hidden");
-      quiz.classList.add("hidden");
-      results.classList.add("hidden");
-      btnStart.textContent = "Começar";
-      resetData(); // só limpa dados
-    }
-  };
-
-  // Botão "Iniciar agora" na tela inicial
-  btnStart2.onclick = (e)=>{
-    e.preventDefault();
-    showQuiz();
-    btnStart.textContent = "Sair"; // também troca
-  };
-
-  $("#btnPrev").onclick = ()=>{ idx=Math.max(0, idx-1); renderQuestion(); updateNav(); };
-  $("#btnNext").onclick = ()=>{ idx=Math.min(QUESTIONS.length-1, idx+1); renderQuestion(); updateNav(); };
-  $("#btnFinish").onclick = ()=> renderResults();
-
-  $("#btnRevisar").onclick = ()=>{
-    results.classList.add("hidden");
-    quiz.classList.remove("hidden");
-    renderQuestion();
-    updateNav();
-  };
-  $("#btnRefazer").onclick = ()=>{ resetData(); showQuiz(); };
-
-  $("#btnSalvar").onclick = ()=>{
-    const payload = { answers, scores: computeScores(), finishedAt: new Date().toISOString() };
-    const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "resultado-vakd.json"; a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  $("#btnPDF").onclick = ()=>{
-    const node = document.getElementById("results");
-    const opt = {
-      margin:       10,
-      filename:     'resultado-vakd.pdf',
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(node).save();
-  };
-
-  document.getElementById("btnComoFunciona").onclick = ()=> 
-    document.getElementById("modalComo").showModal();
-});
+  questionContainer
