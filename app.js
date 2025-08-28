@@ -40,9 +40,7 @@ const TYPES = {
        ]},
 };
 
-// ---------------------------
-// QUESTIONS
-// ---------------------------
+// 12 questões, cada uma com 4 opções: V, A, K, D
 const QUESTIONS = [
   { title:"Quando você precisa lembrar de algo, você geralmente…",
     options:[
@@ -134,7 +132,7 @@ const QUESTIONS = [
 // STATE
 // ---------------------------
 let idx = 0;
-let answers = Array(QUESTIONS.length).fill(null);
+let answers = Array(QUESTIONS.length).fill(null); // 'V' | 'A' | 'K' | 'D'
 let chart;
 
 // ---------------------------
@@ -266,41 +264,21 @@ function showQuiz(){
   updateNav();
 }
 
-function resetData(){
+function resetAll(){
   idx = 0;
   answers = Array(QUESTIONS.length).fill(null);
-  if(chart){ chart.destroy(); chart=null; }
-  progressBar.style.width = `0%`;
-  progressText.textContent = `Questão 1 / ${QUESTIONS.length}`;
-  questionContainer.innerHTML = "";
+  showQuiz();
 }
 
 // ---------------------------
 // EVENTS
 // ---------------------------
 document.addEventListener("DOMContentLoaded", ()=>{
-  const btnStart = $("#btnStart");
-  const btnStart2 = $("#btnStart2");
+  const btnStart = document.getElementById("btnStart");
+  const btnStart2 = document.getElementById("btnStart2");
 
-  btnStart.onclick = (e)=>{
-    e.preventDefault();
-    if(btnStart.textContent.trim()==="Começar"){
-      showQuiz();
-      btnStart.textContent = "Sair";
-    } else {
-      intro.classList.remove("hidden");
-      quiz.classList.add("hidden");
-      results.classList.add("hidden");
-      btnStart.textContent = "Começar";
-      resetData();
-    }
-  };
-
-  btnStart2.onclick = (e)=>{
-    e.preventDefault();
-    showQuiz();
-    btnStart.textContent = "Sair";
-  };
+  btnStart.onclick = (e)=>{ e.preventDefault(); showQuiz(); };
+  btnStart2.onclick = (e)=>{ e.preventDefault(); showQuiz(); };
 
   $("#btnPrev").onclick = ()=>{ idx=Math.max(0, idx-1); renderQuestion(); updateNav(); };
   $("#btnNext").onclick = ()=>{ idx=Math.min(QUESTIONS.length-1, idx+1); renderQuestion(); updateNav(); };
@@ -312,7 +290,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     renderQuestion();
     updateNav();
   };
-  $("#btnRefazer").onclick = ()=>{ resetData(); showQuiz(); };
+  $("#btnRefazer").onclick = resetAll;
 
   $("#btnSalvar").onclick = ()=>{
     const payload = { answers, scores: computeScores(), finishedAt: new Date().toISOString() };
@@ -324,7 +302,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   };
 
   $("#btnPDF").onclick = ()=>{
-    const node = $("#results");
+    const node = document.getElementById("results");
     const opt = {
       margin:       10,
       filename:     'resultado-vakd.pdf',
@@ -335,5 +313,5 @@ document.addEventListener("DOMContentLoaded", ()=>{
     html2pdf().set(opt).from(node).save();
   };
 
-  $("#btnComoFunciona").onclick = ()=> $("#modalComo").showModal();
+  document.getElementById("btnComoFunciona").onclick = ()=> document.getElementById("modalComo").showModal();
 });
